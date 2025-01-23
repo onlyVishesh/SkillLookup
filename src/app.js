@@ -9,7 +9,7 @@ const skills = SKILLS_LIST;
 
 const options = {
   includeScore: true,
-  threshold: 0.2, 
+  threshold: 0.2,
   keys: ["skill"],
 };
 
@@ -19,7 +19,7 @@ const fuse = new Fuse(
 );
 
 function searchSkills(query) {
-  if (!query) return skills; 
+  if (!query) return skills;
 
   const queryLower = query.toLowerCase();
 
@@ -43,23 +43,32 @@ function paginateResults(results, page = 1, limit = 10) {
 }
 
 app.get("/api/skills", (req, res) => {
-  const { query = "", page = 1, limit = 10 } = req.query;
+  try {
+    const { query = "", page = 1, limit = 10 } = req.query;
 
-  const filteredSkills = searchSkills(query);
+    const filteredSkills = searchSkills(query);
 
-  const paginatedSkills = paginateResults(
-    filteredSkills,
-    parseInt(page),
-    parseInt(limit)
-  );
+    const paginatedSkills = paginateResults(
+      filteredSkills,
+      parseInt(page),
+      parseInt(limit)
+    );
 
-  res.json({
-    query,
-    totalResults: filteredSkills.length,
-    totalPages: Math.ceil(filteredSkills.length / limit),
-    currentPage: parseInt(page),
-    skills: paginatedSkills,
-  });
+    return res.json({
+      success: true,
+      message:"Skills fetched",
+      query,
+      totalResults: filteredSkills.length,
+      totalPages: Math.ceil(filteredSkills.length / limit),
+      currentPage: parseInt(page),
+      skills: paginatedSkills,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      error: err,
+    });
+  }
 });
 
 app.listen(port, () => {
