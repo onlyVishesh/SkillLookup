@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const Fuse = require("fuse.js");
 const { SKILLS_LIST } = require("../skills");
 require("dotenv").config();
@@ -41,6 +42,14 @@ function paginateResults(results, page = 1, limit = 10) {
   const end = page * limit;
   return results.slice(start, end);
 }
+
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.get("/api/skills", (req, res) => {
   try {
